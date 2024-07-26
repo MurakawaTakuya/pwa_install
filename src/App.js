@@ -1,6 +1,8 @@
 import { Helmet } from 'react-helmet';
 import './App.scss';
 import { useEffect, useState } from 'react';
+import { css, ClassNames } from '@emotion/react';
+import Button from '@mui/material/Button';
 
 function App() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
@@ -10,7 +12,7 @@ function App() {
   useEffect(() => {
     // Service Workerの有効化
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
+      navigator.serviceWorker.register(`${process.env.PUBLIC_URL}/service-worker.js`)
         .then(function(registration) {
           console.log('Service Worker registered with scope:', registration.scope);
         })
@@ -50,18 +52,28 @@ function App() {
     }
   };
 
+  const flexButtonStyle = css({
+    display: 'flex',
+    justifyContent: 'center',
+  });
+
   return (
     <div className="App">
       <Helmet>
         <link rel="manifest" href="manifest.webmanifest" />
         <title>React PWA</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
       </Helmet>
-      <h1>React PWA</h1>
-      {/* PWAダウンロードボタンの追加 */}
+      <h1>PWA INSTALL TEST</h1>
       {deferredPrompt && !isIOS && (
-        <button onClick={handleInstall}>Install PWA</button>
+        <ClassNames>
+          {({ css }) => (
+            <div className={css(flexButtonStyle)}>
+              <Button variant="outlined" onClick={handleInstall}>Install PWA</Button>
+            </div>
+          )}
+        </ClassNames>
       )}
-      {/* iOS用のインストールガイドを表示 */}
       {isIOS && !isInStandaloneMode && (
         <div className="ios-install-guide">
           <p>このアプリをインストールするには、Safariの共有ボタンをタップし、「ホーム画面に追加」を選択してください。</p>
