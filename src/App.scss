@@ -6,6 +6,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: #e0e5ec;
+  text-align: center;
 }
 h1 {
   position: relative;
@@ -20,4 +21,19 @@ h1 {
   font-weight: 600;
   color: #05c800;
   text-align: center;
+}
+
+.installed-or-error{
+  columns: red;
+}
+
+.debug-log{
+  text-align: left;
+  padding: 0 5vw;
+  width: max(50vw, 400px);
+  margin: 0 auto;
+  ul{
+    padding-left: 15px;
+    list-style: none;
+  }
 }

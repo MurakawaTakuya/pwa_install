@@ -78,14 +78,18 @@ function App() {
       {isInStandaloneMode ? (
         <p className='pwa-already-installed'>&#10003;既にインストールされています</p>
       ) : (
-        deferredPrompt && !isIOS && (
-          <ClassNames>
-            {({ css }) => (
-              <div className={css(flexButtonStyle)}>
-                <Button variant="outlined" onClick={handleInstall}>Install PWA</Button>
-              </div>
-            )}
-          </ClassNames>
+        !deferredPrompt ? (
+          <p className='installed-or-error'>既にインストールさているか、エラーです</p>
+        ) : (
+          deferredPrompt && !isIOS && (
+            <ClassNames>
+              {({ css }) => (
+                <div className={css(flexButtonStyle)}>
+                  <Button variant="outlined" onClick={handleInstall}>Install PWA</Button>
+                </div>
+              )}
+            </ClassNames>
+          )
         )
       )}
       {isIOS && !isInStandaloneMode && (
