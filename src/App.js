@@ -8,16 +8,17 @@ function App() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isInStandaloneMode, setIsInStandaloneMode] = useState(false);
+  const [log, setLog] = useState([]);
 
   useEffect(() => {
     // Service Workerの有効化
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register(`${process.env.PUBLIC_URL}/service-worker.js`)
         .then(function(registration) {
-          console.log('Service Worker registered with scope:', registration.scope);
+          setLog(prevLog => [...prevLog, `Service Worker registered with scope: ${registration.scope}`]);
         })
         .catch(function(error) {
-          console.error('Service Worker registration failed:', error);
+          setLog(prevLog => [...prevLog, `Service Worker registration failed: ${error}`]);
         });
     }
 
@@ -25,17 +26,26 @@ function App() {
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
     setIsIOS(isIOSDevice);
+    setLog(prevLog => [...prevLog, `Is iOS device: ${isIOSDevice}`]);
 
     // スタンドアロンモードかどうかをチェック
-    const standalone = window.navigator.standalone === true;
+    const standalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
     setIsInStandaloneMode(standalone);
+    setLog(prevLog => [...prevLog, `Is in standalone mode: ${standalone}`]);
 
     // beforeinstallpromptイベントをリスン
-    window.addEventListener('beforeinstallprompt', (e) => {
+    const handleBeforeInstallPrompt = (e) => {
+      setLog(prevLog => [...prevLog, 'beforeinstallprompt event detected']);
       e.preventDefault();
       setDeferredPrompt(e);
-      console.log('beforeinstallprompt event was fired.');
-    });
+      setLog(prevLog => [...prevLog, 'beforeinstallprompt event was prevented and deferredPrompt set']);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
 
   const handleInstall = () => {
@@ -43,9 +53,9 @@ function App() {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the A2HS prompt');
+          setLog(prevLog => [...prevLog, 'User accepted the A2HS prompt']);
         } else {
-          console.log('User dismissed the A2HS prompt');
+          setLog(prevLog => [...prevLog, 'User dismissed the A2HS prompt']);
         }
         setDeferredPrompt(null);
       });
@@ -79,6 +89,14 @@ function App() {
           <p>このアプリをインストールするには、Safariの共有ボタンをタップし、「ホーム画面に追加」を選択してください。</p>
         </div>
       )}
+      <div className="debug-log">
+        <h2>Debug Log</h2>
+        <ul>
+          {log.map((entry, index) => (
+            <li key={index}>{entry}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
