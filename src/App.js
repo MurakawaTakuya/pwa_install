@@ -75,14 +75,18 @@ function App() {
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
       </Helmet>
       <h1>PWA INSTALL TEST</h1>
-      {deferredPrompt && !isIOS && (
-        <ClassNames>
-          {({ css }) => (
-            <div className={css(flexButtonStyle)}>
-              <Button variant="outlined" onClick={handleInstall}>Install PWA</Button>
-            </div>
-          )}
-        </ClassNames>
+      {isInStandaloneMode ? (
+        <p className='pwa-already-installed'>&#10003;既にインストールされています</p>
+      ) : (
+        deferredPrompt && !isIOS && (
+          <ClassNames>
+            {({ css }) => (
+              <div className={css(flexButtonStyle)}>
+                <Button variant="outlined" onClick={handleInstall}>Install PWA</Button>
+              </div>
+            )}
+          </ClassNames>
+        )
       )}
       {isIOS && !isInStandaloneMode && (
         <div className="ios-install-guide">
